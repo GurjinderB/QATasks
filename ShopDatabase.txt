@@ -1,0 +1,154 @@
+CREATE DATABASE shop;
+USE shop;
+
+# Creating 4 tables
+CREATE TABLE user (
+user_id int AUTO_INCREMENT,
+user_name varchar(100) NOT NULL,
+address varchar(200) NOT NULL,
+email varchar(100) NOT NULL,
+PRIMARY KEY(user_id)
+);
+
+CREATE TABLE product (
+product_id int AUTO_INCREMENT,
+product_name varchar(100) NOT NULL,
+price dec(5,2) NOT NULL,
+availability int,
+PRIMARY KEY(product_id)
+);
+
+CREATE TABLE orders (
+order_id int AUTO_INCREMENT,
+fk_user_id int NOT NULL,
+date DATETIME NOT NULL,
+PRIMARY KEY(order_id),
+FOREIGN KEY(fk_user_id) REFERENCES user(user_id)
+);
+
+CREATE TABLE orderline (
+orderline_id int AUTO_INCREMENT,
+fk_order_id int NOT NULL,
+fk_product_id int NOT NULL,
+PRIMARY KEY(orderline_id),
+FOREIGN KEY(fk_order_id) REFERENCES orders(order_id),
+FOREIGN KEY(fk_product_id) REFERENCES product(product_id)
+);
+
+
+# Creating records
+INSERT INTO user(user_name, address, email) 
+VALUES('John Russell', '27 Alder Crescent, BH12 4BD', 'JR123@hotmail.com'),
+('Lucy Taylor', '108 Barnsley Rd, WF1 5NX', 'LucyTaylor12@gmail.com'),
+('Poppy Richards', '71 Crookham Rd, GU51 5NP', 'PoppyR789@yahoo.com'),
+('Laura Owen', '46 Holton Rd, CF63 4HD', 'LauraO@hotmail.co.uk'),
+('Harley Lewis', '23 High Ct Ln, LS2 7EU', 'Harley1973@gmail.com');
+
+INSERT INTO product(product_name, price, availability)
+VALUES('Jacket', 159.50, 10), ('Jumper', 120.00, 3), ('Hat', 59.95, 15),
+('Trousers', 74.99, 6), ('Shoes', 189, 2);
+
+INSERT INTO orders(fk_user_id, date)
+VALUES(1, '2022-02-14'), (2, '2021-12-24'), (3, '2021-11-04'), (4, '2021-03-02'), (5, '2021-01-12');
+
+INSERT INTO orderline(fk_order_id, fk_product_id)
+VALUES(1, 1), (2, 5), (3, 2), (4, 3), (5, 4);
+
+
+# Updating records
+UPDATE user
+SET user_name='John Russell Jr'
+WHERE user_name='John Russell';
+
+UPDATE user
+SET email='PoppyRichards15@yahoo.com'
+WHERE email='PoppyR789@yahoo.com';
+
+UPDATE product
+SET availability=10
+WHERE product_id=3;
+
+UPDATE product
+SET product_name='Woolly Hat'
+WHERE product_id=3;
+
+UPDATE orders
+SET date='2022-02-12'
+WHERE order_id=1;
+
+UPDATE orders
+SET date='2020-12-23'
+WHERE order_id=2;
+
+UPDATE orderline
+SET fk_product_id=4
+WHERE orderline_id=2;
+
+UPDATE orderline
+SET fk_product_id=5
+WHERE orderline_id=5;
+
+
+# Database queries
+SELECT o.fk_order_id, p.product_id, p.product_name
+FROM orderline o
+JOIN product p
+ON o.fk_product_id=p.product_id;
+
+SELECT SUM(price) FROM product;
+SELECT product_name, price FROM product WHERE price<100;
+SELECT user_name, email FROM user WHERE email LIKE '%yahoo%';
+SELECT * FROM product ORDER BY price ASC;
+SELECT user_name, address FROM user WHERE address LIKE '%Barnsley%';
+SELECT * FROM user ORDER BY user_name ASC;
+
+SELECT u.user_name, o.date, p.product_name
+FROM user u
+JOIN orders o 
+ON u.user_id=o.fk_user_id
+JOIN orderline ord
+ON o.order_id=ord.fk_order_id
+JOIN product p
+ON p.product_id=ord.fk_product_id;
+
+SELECT u.user_name
+FROM user u
+JOIN orders o 
+ON u.user_id=o.fk_user_id
+JOIN orderline ord
+ON o.order_id=ord.fk_order_id
+JOIN product p
+ON p.product_id=ord.fk_product_id
+WHERE product_name='Jacket';
+
+SELECT u.user_name, p.product_name, p.price
+FROM user u
+JOIN orders o 
+ON u.user_id=o.fk_user_id
+JOIN orderline ord
+ON o.order_id=ord.fk_order_id
+JOIN product p
+ON p.product_id=ord.fk_product_id
+WHERE user_name LIKE '%Jr%';
+
+# (Adding and) Deleting one record per table
+INSERT INTO user(user_name, address, email) 
+VALUES('Theo Harris', '45 West Meade,GU14 7LT', 'Theo123@hotmail.com');
+INSERT INTO product(product_name, price, availability)
+VALUES('Yeezys', 450.50, 2);
+INSERT INTO orders(fk_user_id, date)
+VALUES(6, '2022-02-16');
+INSERT INTO orderline(fk_order_id, fk_product_id)
+VALUES(6, 6);
+
+SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM user WHERE user_id=6;
+DELETE FROM product WHERE product_id=6;
+DELETE FROM orders WHERE order_id=6;
+DELETE FROM orderline WHERE orderline_id=6;
+
+
+
+
+
+
